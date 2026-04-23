@@ -1,77 +1,70 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const asyncHandler = require('../utils/asyncHandler');
+const ApiError = require('../utils/ApiError');
+const ApiResponse = require('../utils/ApiResponse');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'secret123', { expiresIn: '30d' });
 };
 
-exports.registerUser = async (req, res) => {
+exports.registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, role } = req.body;
-  try {
-    const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ message: 'User already exists' });
 
-    const user = await User.create({ name, email, password, role });
-    res.status(201).json({
+  const userExists = await User.findOne({ email });
+  if (userExists) {
+    throw new ApiError(400, 'User already exists');
+  }
+
+  const user = await User.create({ name, email, password, role });
+  
+  const userData = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    token: generateToken(user._id),
+  };
+
+  res.status(201).json(new ApiResponse(201, userData, "User registered successfully"));
+});
+
+exports.loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+  if (user && (await user.comparePassword(password))) {
+    const userData = {
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
       token: generateToken(user._id),
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    };
+    res.status(200).json(new ApiResponse(200, userData, "User logged in successfully"));
+  } else {
+    throw new ApiError(401, 'Invalid email or password');
   }
-};
+});
 
-exports.loginUser = async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (user && (await user.comparePassword(password))) {
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+exports.getMe = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id).select('-password');
+  if (!user) {
+    throw new ApiError(404, "User not found");
   }
-};
+  res.status(200).json(new ApiResponse(200, user, "User fetched successfully"));
+});
 
-exports.getMe = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select('-password');
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+exports.getAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find({}).select('-password').sort({ createdAt: -1 });
+  res.status(200).json(new ApiResponse(200, users, "Users fetched successfully"));
+});
 
-exports.getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find({}).select('-password').sort({ createdAt: -1 });
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+exports.deleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
   }
-};
-
-exports.deleteUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (user) {
-      await user.deleteOne();
-      res.json({ message: 'User removed' });
-    } else {
-      res.status(404).json({ message: 'User not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  await user.deleteOne();
+  res.status(200).json(new ApiResponse(200, {}, "User removed successfully"));
+});

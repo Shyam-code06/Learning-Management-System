@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import { Search, Filter, Star, Clock, BookOpen, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -16,8 +16,9 @@ const CourseCatalog = () => {
 
   const fetchCourses = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/courses');
-      setCourses(res.data);
+      const res = await api.get('/courses');
+      const coursesData = res.data?.data || res.data;
+      setCourses(coursesData);
     } catch (error) {
       console.error('Error fetching courses', error);
     } finally {

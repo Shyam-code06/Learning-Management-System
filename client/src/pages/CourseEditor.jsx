@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 import { Plus, Trash2, Video, FileText, ChevronDown, ChevronUp, Save, ArrowLeft, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
@@ -26,8 +26,11 @@ const CourseEditor = () => {
 
   const fetchCourse = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/courses/${id}`);
-      setCourse(res.data);
+      const res = await api.get(`/courses/${id}`);
+      const courseData = res.data?.data || res.data;
+      // Safety: Ensure sections exists as an array
+      if (!courseData.sections) courseData.sections = [];
+      setCourse(courseData);
     } catch (error) {
       toast.error('Failed to load course');
     } finally {
@@ -42,10 +45,10 @@ const CourseEditor = () => {
 
     try {
       if (isEdit) {
-        await axios.put(`http://localhost:5000/api/courses/${id}`, course);
+        await api.put(`/courses/${id}`, course);
         toast.success('Course updated!');
       } else {
-        await axios.post('http://localhost:5000/api/courses', course);
+        await api.post('/courses', course);
         toast.success('Course created!');
       }
       navigate('/admin');
@@ -166,7 +169,7 @@ const CourseEditor = () => {
               </div>
 
               <div className="space-y-6">
-                {course.sections.map((section, sIdx) => (
+                {(course?.sections || []).map((section, sIdx) => (
                   <div key={sIdx} className="p-6 bg-background rounded-2xl border border-secondary">
                     <div className="flex justify-between items-center mb-4">
                       <input
@@ -181,39 +184,61 @@ const CourseEditor = () => {
                     </div>
 
                     <div className="space-y-3 mb-4">
-                      {section.lessons.map((lesson, lIdx) => (
-                        <div key={lIdx} className="bg-white p-4 rounded-xl border border-secondary">
-                          <div className="flex flex-col sm:flex-row gap-4">
-                            <div className="flex-grow space-y-2">
-                              <input
-                                type="text"
-                                value={lesson.title}
-                                onChange={(e) => updateLesson(sIdx, lIdx, 'title', e.target.value)}
-                                className="w-full font-bold text-sm outline-none border-b border-transparent focus:border-primary mb-2"
-                                placeholder="Lesson Title"
-                              />
-                              <div className="flex gap-4">
+                      {(section?.lessons || []).map((lesson, lIdx) => (
+                        <div key={lIdx} className="bg-white p-5 rounded-2xl border border-secondary shadow-sm">
+                          <div className="flex flex-col gap-4">
+                            <div className="flex justify-between items-start">
+                              <div className="flex items-center gap-3 flex-grow">
+                                <div className="w-8 h-8 bg-background rounded-lg flex items-center justify-center text-primary">
+                                  {lesson.type === 'video' ? <Video size={16} /> : <FileText size={16} />}
+                                </div>
+                                <input
+                                  type="text"
+                                  value={lesson.title}
+                                  onChange={(e) => updateLesson(sIdx, lIdx, 'title', e.target.value)}
+                                  className="flex-grow font-bold text-base outline-none border-b border-transparent focus:border-primary"
+                                  placeholder="Lesson Title"
+                                />
+                              </div>
+                              <button onClick={() => removeLesson(sIdx, lIdx)} className="text-text-muted hover:text-red-500 transition-colors">
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Type</label>
                                 <select
                                   value={lesson.type}
                                   onChange={(e) => updateLesson(sIdx, lIdx, 'type', e.target.value)}
-                                  className="text-xs font-bold bg-background p-1 rounded"
+                                  className="w-full text-xs font-bold bg-background p-2.5 rounded-lg border border-transparent focus:border-primary outline-none"
                                 >
-                                  <option value="video">Video</option>
-                                  <option value="text">Text</option>
-                                  <option value="pdf">PDF</option>
+                                  <option value="video">Video URL</option>
+                                  <option value="text">Rich Text Content</option>
+                                  <option value="pdf">PDF Resource URL</option>
                                 </select>
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Duration (min)</label>
+                                <input
+                                  type="text"
+                                  value={lesson.duration || ''}
+                                  onChange={(e) => updateLesson(sIdx, lIdx, 'duration', e.target.value)}
+                                  className="w-full text-xs font-bold bg-background p-2.5 rounded-lg border border-transparent focus:border-primary outline-none"
+                                  placeholder="e.g. 10:00"
+                                />
+                              </div>
+                              <div className="md:col-span-1 space-y-1">
+                                <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Content / Source</label>
                                 <input
                                   type="text"
                                   value={lesson.content}
                                   onChange={(e) => updateLesson(sIdx, lIdx, 'content', e.target.value)}
-                                  className="flex-grow text-xs outline-none border-b border-secondary focus:border-primary"
-                                  placeholder={lesson.type === 'video' ? 'YouTube URL' : 'Content or Link'}
+                                  className="w-full text-xs font-bold bg-background p-2.5 rounded-lg border border-transparent focus:border-primary outline-none"
+                                  placeholder={lesson.type === 'video' ? 'YouTube/Vimeo Link' : 'Content URL or Text'}
                                 />
                               </div>
                             </div>
-                            <button onClick={() => removeLesson(sIdx, lIdx)} className="text-text-muted hover:text-red-500 self-start">
-                              <Trash2 size={16} />
-                            </button>
                           </div>
                         </div>
                       ))}
@@ -221,14 +246,14 @@ const CourseEditor = () => {
 
                     <button
                       onClick={() => addLesson(sIdx)}
-                      className="w-full py-2 border-2 border-dashed border-secondary rounded-xl text-text-muted hover:text-primary hover:border-primary transition-all text-sm font-bold flex items-center justify-center gap-2"
+                      className="w-full py-3 border-2 border-dashed border-secondary rounded-2xl text-text-muted hover:text-primary hover:border-primary hover:bg-primary/5 transition-all text-xs font-bold flex items-center justify-center gap-2"
                     >
-                      <Plus size={16} /> Add Lesson
+                      <Plus size={18} /> Add Module Content
                     </button>
                   </div>
                 ))}
 
-                {course.sections.length === 0 && (
+                {(!course?.sections || course.sections.length === 0) && (
                   <div className="py-12 text-center bg-background rounded-2xl border-2 border-dashed border-secondary">
                     <p className="text-text-muted mb-4">Start building your course structure</p>
                     <button onClick={addSection} className="btn btn-outline py-2 px-6">Create First Module</button>

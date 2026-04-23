@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { Check, Play, Clock, Globe, Award, ShieldCheck, Star, ChevronDown, ChevronUp, BookOpen, FileText, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -22,8 +22,9 @@ const CourseDetails = () => {
 
   const fetchCourse = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/courses/${id}`);
-      setCourse(res.data);
+      const res = await api.get(`/courses/${id}`);
+      const courseData = res.data?.data || res.data;
+      setCourse(courseData);
     } catch (error) {
       toast.error('Course not found');
       navigate('/courses');
@@ -34,7 +35,7 @@ const CourseDetails = () => {
 
   const checkEnrollment = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/enrollments/course/${id}`);
+      const res = await api.get(`/enrollments/course/${id}`);
       if (res.data) setIsEnrolled(true);
     } catch (error) {
       setIsEnrolled(false);
@@ -57,7 +58,7 @@ const CourseDetails = () => {
 
   const enrollDirectly = async () => {
     try {
-      await axios.post('http://localhost:5000/api/enrollments/enroll', { courseId: id });
+      await api.post('/enrollments/enroll', { courseId: id });
       toast.success('Successfully enrolled!');
       setIsEnrolled(true);
     } catch (error) {

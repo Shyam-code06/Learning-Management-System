@@ -9,4 +9,7 @@ const paymentSchema = new mongoose.Schema({
   couponCode: { type: String }
 }, { timestamps: true });
 
+paymentSchema.index({ userId: 1 });
+paymentSchema.index({ transactionId: 1 }, { unique: true });
+
 module.exports = mongoose.model('Payment', paymentSchema);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, User, LogOut, Menu, X, Layers, LayoutDashboard } from 'lucide-react';
 
@@ -8,6 +8,9 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isLearningPage = location.pathname.startsWith('/learn');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,17 +32,26 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-8 font-medium">
-          <Link to="/" className="hover:text-primary transition-colors">Home</Link>
-          <Link to="/courses" className="hover:text-primary transition-colors">Courses</Link>
+          {!isLearningPage && (
+            <>
+              <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+              <Link to="/courses" className="hover:text-primary transition-colors">Courses</Link>
+            </>
+          )}
+          
           {user ? (
             <div className="flex items-center gap-4">
-              <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} className="flex items-center gap-2 btn btn-outline py-2 px-4">
-                <LayoutDashboard size={18} />
-                Dashboard
-              </Link>
-              <button onClick={logout} className="p-2 text-text-muted hover:text-primary transition-colors">
-                <LogOut size={20} />
-              </button>
+              {(location.pathname !== '/dashboard' || isLearningPage) && (
+                <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} className="flex items-center gap-2 btn btn-outline py-2 px-4">
+                  <LayoutDashboard size={18} />
+                  {isLearningPage ? 'Go to Dashboard' : 'Dashboard'}
+                </Link>
+              )}
+              {!isLearningPage && (
+                <button onClick={logout} className="p-2 text-text-muted hover:text-primary transition-colors">
+                  <LogOut size={20} />
+                </button>
+              )}
             </div>
           ) : (
             <div className="flex items-center gap-4">
@@ -58,12 +70,20 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden glass absolute top-full left-0 w-full p-6 flex flex-col gap-4 animate-fade shadow-lg">
-          <Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-          <Link to="/courses" onClick={() => setMobileMenuOpen(false)}>Courses</Link>
+          {!isLearningPage && (
+            <>
+              <Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+              <Link to="/courses" onClick={() => setMobileMenuOpen(false)}>Courses</Link>
+            </>
+          )}
           {user ? (
             <>
-              <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
-              <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="text-left text-primary">Logout</button>
+              {(location.pathname !== '/dashboard' || isLearningPage) && (
+                <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} onClick={() => setMobileMenuOpen(false)}>
+                  {isLearningPage ? 'Go to Dashboard' : 'Dashboard'}
+                </Link>
+              )}
+              {!isLearningPage && <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="text-left text-primary">Logout</button>}
             </>
           ) : (
             <>

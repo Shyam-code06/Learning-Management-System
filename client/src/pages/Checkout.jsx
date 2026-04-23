@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { CreditCard, Tag, ShieldCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -28,7 +28,7 @@ const Checkout = () => {
 
   const fetchCourse = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/courses/${id}`);
+      const res = await api.get(`/courses/${id}`);
       setCourse(res.data);
     } catch (error) {
       toast.error('Course not found');
@@ -45,7 +45,7 @@ const Checkout = () => {
       return;
     }
     try {
-      const res = await axios.post('http://localhost:5000/api/coupons/validate', { code: couponCode });
+      const res = await api.post('/coupons/validate', { code: couponCode });
       setDiscount(res.data.discountPercent);
       toast.success(`Exclusive Discount Applied! ${res.data.discountPercent}% OFF your total.`);
     } catch (error) {
@@ -63,7 +63,7 @@ const Checkout = () => {
     // Simulate API delay
     setTimeout(async () => {
       try {
-        await axios.post('http://localhost:5000/api/payments/process', {
+        await api.post('/payments/process', {
           courseId: id,
           amount: finalPrice,
           couponCode: discount > 0 ? couponCode : null

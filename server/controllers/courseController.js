@@ -1,37 +1,27 @@
 const Course = require('../models/Course');
+const asyncHandler = require('../utils/asyncHandler');
+const ApiError = require('../utils/ApiError');
+const ApiResponse = require('../utils/ApiResponse');
 
-exports.getCourses = async (req, res) => {
-  try {
-    const courses = await Course.find({ isPublished: true });
-    res.json(courses);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+exports.getCourses = asyncHandler(async (req, res) => {
+  const courses = await Course.find({ isPublished: true });
+  res.status(200).json(new ApiResponse(200, courses, "Courses fetched successfully"));
+});
+
+exports.getAdminCourses = asyncHandler(async (req, res) => {
+  const courses = await Course.find({ instructor: req.user.id });
+  res.status(200).json(new ApiResponse(200, courses, "Admin courses fetched successfully"));
+});
+
+exports.getCourseById = asyncHandler(async (req, res) => {
+  const course = await Course.findById(req.params.id);
+  if (!course) {
+    throw new ApiError(404, "Course not found");
   }
-};
+  res.status(200).json(new ApiResponse(200, course, "Course fetched successfully"));
+});
 
-exports.getAdminCourses = async (req, res) => {
-  try {
-    const courses = await Course.find({ instructor: req.user.id });
-    res.json(courses);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.getCourseById = async (req, res) => {
-  try {
-    const course = await Course.findById(req.params.id);
-    if (course) {
-      res.json(course);
-    } else {
-      res.status(404).json({ message: 'Course not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.createCourse = async (req, res) => {
+exports.createCourse = asyncHandler(async (req, res) => {
   const { title, description, price, category } = req.body;
 
   // Constant high-quality images based on category
@@ -45,54 +35,43 @@ exports.createCourse = async (req, res) => {
 
   const autoThumbnail = req.body.thumbnail || (categoryImages[category] || categoryImages.Default);
 
-  try {
-    const course = await Course.create({
-      title,
-      description,
-      price,
-      thumbnail: autoThumbnail,
-      category,
-      instructor: req.user.id,
-      sections: []
-    });
-    res.status(201).json(course);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  const course = await Course.create({
+    title,
+    description,
+    price,
+    thumbnail: autoThumbnail,
+    category,
+    instructor: req.user.id,
+    sections: req.body.sections || []
+  });
 
-exports.updateCourse = async (req, res) => {
-  try {
-    const course = await Course.findById(req.params.id);
-    if (course) {
-      course.title = req.body.title || course.title;
-      course.description = req.body.description || course.description;
-      course.price = req.body.price || course.price;
-      course.thumbnail = req.body.thumbnail || course.thumbnail;
-      course.category = req.body.category || course.category;
-      course.sections = req.body.sections || course.sections;
-      course.isPublished = req.body.isPublished !== undefined ? req.body.isPublished : course.isPublished;
+  res.status(201).json(new ApiResponse(201, course, "Course created successfully"));
+});
 
-      const updatedCourse = await course.save();
-      res.json(updatedCourse);
-    } else {
-      res.status(404).json({ message: 'Course not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+exports.updateCourse = asyncHandler(async (req, res) => {
+  const course = await Course.findById(req.params.id);
+  if (!course) {
+    throw new ApiError(404, "Course not found");
   }
-};
 
-exports.deleteCourse = async (req, res) => {
-  try {
-    const course = await Course.findById(req.params.id);
-    if (course) {
-      await course.deleteOne();
-      res.json({ message: 'Course removed' });
-    } else {
-      res.status(404).json({ message: 'Course not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  course.title = req.body.title || course.title;
+  course.description = req.body.description || course.description;
+  course.price = req.body.price || course.price;
+  course.thumbnail = req.body.thumbnail || course.thumbnail;
+  course.category = req.body.category || course.category;
+  course.sections = req.body.sections || course.sections;
+  course.isPublished = req.body.isPublished !== undefined ? req.body.isPublished : course.isPublished;
+
+  const updatedCourse = await course.save();
+  res.status(200).json(new ApiResponse(200, updatedCourse, "Course updated successfully"));
+});
+
+exports.deleteCourse = asyncHandler(async (req, res) => {
+  const course = await Course.findById(req.params.id);
+  if (!course) {
+    throw new ApiError(404, "Course not found");
   }
-};
+
+  await course.deleteOne();
+  res.status(200).json(new ApiResponse(200, {}, "Course removed successfully"));
+});

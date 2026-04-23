@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 import { CheckCircle, Play, Star, Users, Award, BookOpen, Tag } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -10,7 +10,7 @@ const Home = () => {
   useEffect(() => {
     const fetchHighestDiscount = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/coupons');
+        const res = await api.get('/coupons');
         const activeCoupons = res.data.filter(c => new Date(c.expiryDate) > new Date() && c.isActive);
         if (activeCoupons.length > 0) {
           const max = Math.max(...activeCoupons.map(c => c.discountPercent));
