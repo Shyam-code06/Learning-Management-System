@@ -39,7 +39,7 @@ const LearningPage = () => {
         const enrollRes = await api.get(`/enrollments/course/${id}`);
         setEnrollment(enrollRes.data?.data || enrollRes.data);
       } catch (err) {
-        console.log("Enrollment check failed, using fallback");
+
         if (user?.role === 'admin') {
           setEnrollment({ progress: 0, completedLessons: [] });
         }

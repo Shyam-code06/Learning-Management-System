@@ -27,7 +27,7 @@ const Home = () => {
       {/* Hero Section */}
       <section className="py-16 md:py-24 overflow-hidden">
         <div className="container grid md:grid-cols-2 gap-12 items-center">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
@@ -35,7 +35,7 @@ const Home = () => {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-6 border border-primary/20">
               <Tag size={16} /> <span>Limited Time: Save up to {highestDiscount}% on all modules!</span>
             </div>
-            <motion.h1 
+            <motion.h1
               className="text-5xl md:text-6xl font-bold mb-6 leading-tight"
               variants={{
                 hidden: { opacity: 0 },
@@ -48,7 +48,7 @@ const Home = () => {
               animate="visible"
             >
               {Array.from("Ecera System LMS").map((letter, index) => (
-                <motion.span 
+                <motion.span
                   key={index}
                   variants={{
                     hidden: { opacity: 0, y: 20 },
@@ -62,7 +62,7 @@ const Home = () => {
               <br />
               <span className="text-primary">
                 {Array.from("Learning").map((letter, index) => (
-                  <motion.span 
+                  <motion.span
                     key={index}
                     variants={{
                       hidden: { opacity: 0, y: 20 },
@@ -98,7 +98,7 @@ const Home = () => {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -106,12 +106,12 @@ const Home = () => {
           >
             <div className="absolute -top-10 -left-10 w-40 h-40 bg-secondary opacity-30 rounded-full blur-3xl animate-pulse"></div>
             <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-accent opacity-20 rounded-full blur-3xl animate-pulse"></div>
-            <img 
-              src="/hero.png" 
-              alt="Learning Workspace" 
+            <img
+              src="/hero.png"
+              alt="Learning Workspace"
               className="relative z-10 rounded-3xl shadow-2xl w-full animate-float"
             />
-            
+
             {/* Floating Discount Badge */}
             <motion.div
               initial={{ scale: 0, rotate: -20 }}
@@ -122,9 +122,9 @@ const Home = () => {
               <span className="text-3xl">{highestDiscount}%</span>
               <span className="text-xs uppercase tracking-tighter">Discount</span>
             </motion.div>
-            
+
             {/* Floating stats */}
-            <motion.div 
+            <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 1, duration: 0.5 }}
@@ -151,7 +151,7 @@ const Home = () => {
               Our enterprise-grade platform provides the robust tools and analytics you need to scale your organizational training.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             <div className="card text-center p-8">
               <div className="w-16 h-16 bg-background rounded-2xl flex items-center justify-center text-primary mx-auto mb-6">
@@ -160,7 +160,7 @@ const Home = () => {
               <h3 className="text-xl font-bold mb-4">Expert Videos</h3>
               <p className="text-text-muted">High-quality video lessons taught by industry leaders in various fields.</p>
             </div>
-            
+
             <div className="card text-center p-8">
               <div className="w-16 h-16 bg-background rounded-2xl flex items-center justify-center text-primary mx-auto mb-6">
                 <Award size={32} />
@@ -168,7 +168,7 @@ const Home = () => {
               <h3 className="text-xl font-bold mb-4">Certifications</h3>
               <p className="text-text-muted">Earn recognized certificates upon course completion to boost your resume.</p>
             </div>
-            
+
             <div className="card text-center p-8">
               <div className="w-16 h-16 bg-background rounded-2xl flex items-center justify-center text-primary mx-auto mb-6">
                 <Users size={32} />
@@ -185,7 +185,7 @@ const Home = () => {
         <div className="container text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to empower your workforce?</h2>
           <p className="text-xl mb-10 text-primary-light">Join Ecera System today and deploy scalable training solutions across your organization.</p>
-          <Link to="/register" className="bg-white text-primary px-10 py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all">
+          <Link to="/register" className="bg-black text-primary px-10 py-4 rounded-xl font-bold- text-lg hover:shadow-xl transition-all">
             Get Started
           </Link>
         </div>

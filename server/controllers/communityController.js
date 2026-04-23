@@ -26,7 +26,7 @@ exports.createPost = asyncHandler(async (req, res) => {
     });
 
     const savedPost = await post.save();
-    console.log(`✅ Student Post Created: ${savedPost._id} by ${req.user.name}`);
+
 
     return res.status(201).json({
       success: true,

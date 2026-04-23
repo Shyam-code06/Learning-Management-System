@@ -56,7 +56,7 @@ exports.askAI = asyncHandler(async (req, res) => {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    console.log("AI Response for student:", text.substring(0, 50) + "...");
+
 
     res.status(200).json(new ApiResponse(200, { text }, "AI response generated"));
   } catch (error) {
@@ -113,7 +113,7 @@ exports.askAdminAI = asyncHandler(async (req, res) => {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    console.log("Admin AI Response:", text.substring(0, 50) + "...");
+
 
     res.status(200).json(new ApiResponse(200, { text }, "Admin AI response generated"));
   } catch (error) {
