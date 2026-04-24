@@ -14,6 +14,9 @@ exports.getAdminCourses = asyncHandler(async (req, res) => {
 });
 
 exports.getCourseById = asyncHandler(async (req, res) => {
+  if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ApiError(400, "Invalid Course ID format. Please use a valid 24-character hex ID.");
+  }
   const course = await Course.findById(req.params.id);
   if (!course) {
     throw new ApiError(404, "Course not found");

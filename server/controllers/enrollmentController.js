@@ -28,6 +28,9 @@ exports.getMyEnrollments = asyncHandler(async (req, res) => {
 });
 
 exports.getEnrollmentByCourseId = asyncHandler(async (req, res) => {
+  if (!req.params.courseId.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ApiError(400, "Invalid Course ID format");
+  }
   const enrollment = await Enrollment.findOne({ userId: req.user._id, courseId: req.params.courseId });
   if (!enrollment) {
     throw new ApiError(404, 'Enrollment not found');

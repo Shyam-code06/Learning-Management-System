@@ -20,7 +20,7 @@ exports.askAI = asyncHandler(async (req, res) => {
 
   // 1. Initialize Gemini AI
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemma-3-27b-it" });
 
   // 2. Fetch user's enrolled courses for context
   const enrollments = await Enrollment.find({ userId: req.user._id }).populate("courseId");
@@ -84,7 +84,7 @@ exports.askAdminAI = asyncHandler(async (req, res) => {
   }
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemma-3-27b-it" });
 
   const platformStats = stats ? `
     Current Platform Statistics:

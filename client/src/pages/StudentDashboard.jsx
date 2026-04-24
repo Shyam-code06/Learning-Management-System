@@ -85,8 +85,8 @@ const StudentDashboard = () => {
     try {
       const res = await api.post('/chat/ai', { message: supportInput });
       
-      // Robust extraction: Handle cases where interceptor might have already unwrapped data
-      const aiText = res.data?.text || res.text || (typeof res.data === 'string' ? res.data : "I received a response but couldn't format it.");
+      // Robust extraction: Handle all response formats
+      const aiText = res.data?.text || res.data?.data?.text || res.text || (typeof res.data === 'string' ? res.data : "I received a response but couldn't format it.");
       
       const aiMsg = { role: 'assistant', content: aiText };
       setAiMessages(prev => [...prev, aiMsg]);
