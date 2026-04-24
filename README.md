@@ -25,6 +25,7 @@ A full-stack learning management platform built with React and Node.js/Express, 
 - Track learning progress
 - Access enrolled courses on dashboard
 - Apply coupon codes for discounts
+- **AI Chatbot with Gemini** - Get instant help with course-related questions
 
 ### Admin Features
 - Admin dashboard for course management
@@ -33,6 +34,7 @@ A full-stack learning management platform built with React and Node.js/Express, 
 - View student enrollments
 - Track course sales and revenue
 - Coupon management system
+- **AI Assistant for Admins** - Get strategic insights and platform analytics
 
 ### General Features
 - Secure JWT-based authentication
@@ -61,6 +63,7 @@ A full-stack learning management platform built with React and Node.js/Express, 
 - **JWT** - Authentication tokens
 - **bcryptjs** - Password hashing
 - **CORS** - Cross-origin resource sharing
+- **Google Gemini AI** - AI-powered chatbot and admin assistant
 
 ## 📁 Project Structure
 
@@ -174,6 +177,9 @@ NODE_ENV=development
 JWT_SECRET=your_jwt_secret_key_here
 JWT_EXPIRE=7d
 
+# Google Gemini AI Configuration
+GEMINI_API_KEY=your_gemini_api_key_here
+
 # Payment Gateway (if applicable)
 PAYMENT_API_KEY=your_payment_api_key
 
@@ -259,6 +265,38 @@ Deploy the server to your hosting platform (Heroku, AWS, DigitalOcean, etc.)
 - `POST /api/coupons` - Create coupon (Admin only)
 - `GET /api/coupons/validate/:code` - Validate coupon code
 - `DELETE /api/coupons/:id` - Delete coupon (Admin only)
+
+### AI Chatbot
+- `POST /api/ai/ask` - Ask AI chatbot (Student) - Get instant help with course-related questions using Google Gemini
+- `POST /api/ai/admin` - Ask AI assistant (Admin) - Get strategic insights and platform analytics
+
+## 🤖 AI Chatbot Integration
+
+This project includes an AI-powered chatbot using **Google Gemini** to enhance the learning experience.
+
+### Student AI Chatbot
+- Located in the student dashboard
+- Provides instant answers to course-related questions
+- Uses enrolled course context for personalized responses
+- Powered by Google Gemini AI (gemma-3-27b-it model)
+
+### Admin AI Assistant
+- Located in the admin dashboard
+- Provides strategic insights and platform analytics
+- Analyzes revenue, student, and course statistics
+- Helps administrators make data-driven decisions
+
+### Setup Gemini API Key
+
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create a new API key
+3. Add it to your server `.env` file:
+
+```bash
+GEMINI_API_KEY=your_google_gemini_api_key_here
+```
+
+> **Note:** The AI features will work in demo mode without an API key, but for full functionality, a valid Gemini API key is required.
 
 ## 💡 Usage
 
