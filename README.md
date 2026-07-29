@@ -364,11 +364,3 @@ This project is licensed under the ISC License.
 ## 👨‍💻 Author
 
 Shyam Kachhadiya
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
----
-
-**Happy Learning!** 🎓
