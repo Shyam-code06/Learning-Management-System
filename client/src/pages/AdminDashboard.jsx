@@ -286,12 +286,7 @@ const AdminDashboard = () => {
     
     const loadingToast = toast.loading('Publishing announcement...');
     try {
-      const token = localStorage.getItem('token');
-      // Bypassing api wrapper to ensure direct delivery but keeping security
-      await axios.post('http://localhost:5000/api/announcements', 
-        { content: announcementContent },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.post('/announcements', { content: announcementContent });
       
       toast.dismiss(loadingToast);
       toast.success('ALIVE! Announcement is now live on the Community Hub.');
