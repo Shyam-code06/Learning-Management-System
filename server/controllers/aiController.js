@@ -11,20 +11,20 @@ exports.askAI = asyncHandler(async (req, res) => {
   if (!message) {
     throw new ApiError(400, "Message is required");
   }
-
-  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
-    return res.status(200).json(new ApiResponse(200, { 
-      text: "I'm ready to help! However, the Gemini API key is missing in the server's .env file. Please add a valid key and restart the server to enable AI responses." 
+  console.log("Condition:", !process.env.GEMINI_API_KEY);
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(200).json(new ApiResponse(200, {
+      text: "I'm ready to help! However, the Gemini API key is missing in the server's .env file. Please add a valid key and restart the server to enable AI responses."
     }, "API Key missing"));
   }
 
   // 1. Initialize Gemini AI
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemma-3-27b-it" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   // 2. Fetch user's enrolled courses for context
   const enrollments = await Enrollment.find({ userId: req.user._id }).populate("courseId");
-  
+
   let courseContext = "";
   if (enrollments.length > 0) {
     courseContext = "The student is currently enrolled in the following courses:\n";
@@ -62,9 +62,9 @@ exports.askAI = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error("Gemini AI Error:", error);
     if (error.status === 429) {
-        return res.status(200).json(new ApiResponse(200, { 
-          text: "I'm receiving too many requests right now. Please wait about 30-60 seconds and try again! (Google's Free Tier limit reached)" 
-        }, "Rate limit reached"));
+      return res.status(200).json(new ApiResponse(200, {
+        text: "I'm receiving too many requests right now. Please wait about 30-60 seconds and try again! (Google's Free Tier limit reached)"
+      }, "Rate limit reached"));
     }
     throw new ApiError(500, "Failed to get response from AI. Please check if the GEMINI_API_KEY is valid.");
   }
@@ -78,13 +78,13 @@ exports.askAdminAI = asyncHandler(async (req, res) => {
   }
 
   if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
-    return res.status(200).json(new ApiResponse(200, { 
-      text: "Admin AI is ready! Please add your GEMINI_API_KEY to the server .env to enable live insights." 
+    return res.status(200).json(new ApiResponse(200, {
+      text: "Admin AI is ready! Please add your GEMINI_API_KEY to the server .env to enable live insights."
     }, "API Key missing"));
   }
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemma-3-27b-it" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const platformStats = stats ? `
     Current Platform Statistics:
@@ -119,9 +119,9 @@ exports.askAdminAI = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error("Gemini Admin AI Error:", error);
     if (error.status === 429) {
-        return res.status(200).json(new ApiResponse(200, { 
-          text: "The AI is currently busy with high traffic. Please try again in a minute." 
-        }, "Rate limit reached"));
+      return res.status(200).json(new ApiResponse(200, {
+        text: "The AI is currently busy with high traffic. Please try again in a minute."
+      }, "Rate limit reached"));
     }
     throw new ApiError(500, `Gemini AI Error: ${error.message || "Failed to get response"}`);
   }

@@ -278,7 +278,7 @@ This project includes an AI-powered chatbot using **Google Gemini** to enhance t
 - Located in the student dashboard
 - Provides instant answers to course-related questions
 - Uses enrolled course context for personalized responses
-- Powered by Google Gemini AI (gemma-3-27b-it model)
+- Powered by Google Gemini AI (gemini-1.5-flash model)
 
 ### Admin AI Assistant
 - Located in the admin dashboard

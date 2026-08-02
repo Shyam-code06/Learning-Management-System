@@ -84,10 +84,10 @@ const StudentDashboard = () => {
 
     try {
       const res = await api.post('/chat/ai', { message: supportInput });
-      
+
       // Robust extraction: Handle all response formats
       const aiText = res.data?.text || res.data?.data?.text || res.text || (typeof res.data === 'string' ? res.data : "I received a response but couldn't format it.");
-      
+
       const aiMsg = { role: 'assistant', content: aiText };
       setAiMessages(prev => [...prev, aiMsg]);
     } catch (error) {
@@ -215,15 +215,14 @@ const StudentDashboard = () => {
   const otherCourses = enrollments.length > 1 ? enrollments.slice(1) : [];
 
   const NavButton = ({ id, icon: Icon, label }) => (
-    <button 
+    <button
       onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-2 lg:gap-3 px-4 py-2 lg:py-3 font-semibold rounded-xl transition-all duration-200 whitespace-nowrap flex-shrink-0 lg:w-full ${
-        activeTab === id 
-        ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm' 
+      className={`flex items-center gap-2 lg:gap-3 px-4 py-2 lg:py-3 font-semibold rounded-xl transition-all duration-200 whitespace-nowrap flex-shrink-0 lg:w-full ${activeTab === id
+        ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm'
         : 'text-text hover:bg-background hover:text-primary'
-      }`}
+        }`}
     >
-      <Icon size={18} className="lg:w-5 lg:h-5" /> 
+      <Icon size={18} className="lg:w-5 lg:h-5" />
       <span className="text-sm lg:text-base">{label}</span>
     </button>
   );
@@ -231,13 +230,13 @@ const StudentDashboard = () => {
   return (
     <div className="pt-24 pb-20 bg-background min-h-screen">
       <div className="container">
-        
+
         <div className="flex flex-col lg:flex-row gap-8">
-          
+
           {/* Sidebar Menu */}
           <div className="lg:w-64 flex-shrink-0 w-full overflow-hidden">
             <div className="card p-3 lg:p-4 lg:sticky lg:top-28 shadow-sm border-border flex flex-col">
-              
+
               {/* Profile Block - Hidden on very small screens, row on mobile, col on desktop */}
               <div className="hidden sm:flex lg:flex-col items-center lg:items-start text-left gap-4 mb-4 lg:mb-6 px-2 lg:px-4">
                 <div className="w-12 h-12 lg:w-20 lg:h-20 bg-primary/20 text-primary rounded-full flex items-center justify-center text-xl lg:text-3xl font-bold shadow-sm border-2 border-white flex-shrink-0">
@@ -255,7 +254,7 @@ const StudentDashboard = () => {
                 <NavButton id="dashboard" icon={Home} label="Dashboard" />
                 <NavButton id="courses" icon={BookOpen} label="My Courses" />
                 <NavButton id="community" icon={MessageSquare} label="Community" />
-                
+
                 <h3 className="hidden lg:block text-xs font-bold text-text-muted uppercase tracking-wider mb-1 mt-4 px-4">Support</h3>
                 <NavButton id="help" icon={HelpCircle} label="Help Center" />
               </div>
@@ -264,7 +263,7 @@ const StudentDashboard = () => {
 
           {/* Main Content Area */}
           <div className="flex-grow">
-            
+
             {activeTab === 'dashboard' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
                 {/* Header Section */}
@@ -360,7 +359,7 @@ const StudentDashboard = () => {
                                   Refund Pending
                                 </span>
                               ) : (
-                                <button 
+                                <button
                                   onClick={() => handleRequestRefund(activeCourse._id)}
                                   className="text-xs font-bold text-red-500 hover:bg-red-50 px-4 py-2 rounded-full transition-colors"
                                 >
@@ -395,73 +394,74 @@ const StudentDashboard = () => {
                   </div>
                   <Link to="/courses" className="text-primary text-sm font-bold hover:underline">Browse More</Link>
                 </div>
-                
+
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {enrollments.map((enrollment, index) => {
                     const isNew = new Date(enrollment.createdAt) > new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
                     return (
-                    <motion.div key={enrollment._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
-                      <div className="card p-0 overflow-hidden group flex flex-col h-full hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-                        <Link to={`/learn/${enrollment.courseId._id}`} className="h-40 relative overflow-hidden">
-                          <img src={enrollment.courseId.thumbnail} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="thumbnail" />
-                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <div className="bg-white/90 p-3 rounded-full text-primary shadow-lg"><PlayCircle size={24} /></div>
-                          </div>
-                        </Link>
-                        <div className="p-5 flex flex-col flex-grow">
-                          <div className="flex justify-between items-start mb-1">
-                            <span className="text-[10px] text-primary font-bold uppercase tracking-wider">{enrollment.courseId.category}</span>
-                            {refunds.find(r => r.courseId?._id === enrollment.courseId?._id && r.status === 'pending') ? (
-                              <span className="text-[9px] font-bold bg-yellow-50 text-yellow-600 px-2 py-1 rounded-full border border-yellow-100">
-                                Cancellation Pending
-                              </span>
-                            ) : (
-                              <button 
-                                onClick={() => handleRequestRefund(enrollment._id)}
-                                className="text-[9px] font-bold text-red-500 hover:bg-red-50 px-2 py-1 rounded-full border border-red-100 transition-colors"
-                              >
-                                Cancel & Refund
-                              </button>
-                            )}
-                          </div>
-                          <h3 className="font-bold text-md mb-3 line-clamp-2 group-hover:text-primary transition-colors">{enrollment.courseId.title}</h3>
-                          <div className="mt-auto pt-3 border-t border-border">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-xs font-medium text-text-muted">Progress</span>
-                              <span className="text-xs font-bold">{enrollment.progress}%</span>
+                      <motion.div key={enrollment._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
+                        <div className="card p-0 overflow-hidden group flex flex-col h-full hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+                          <Link to={`/learn/${enrollment.courseId._id}`} className="h-40 relative overflow-hidden">
+                            <img src={enrollment.courseId.thumbnail} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="thumbnail" />
+                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <div className="bg-white/90 p-3 rounded-full text-primary shadow-lg"><PlayCircle size={24} /></div>
                             </div>
-                            <div className="w-full bg-secondary rounded-full h-1 mb-4">
-                              <div className="bg-primary h-full rounded-full transition-all duration-500" style={{ width: `${enrollment.progress}%` }}></div>
+                          </Link>
+                          <div className="p-5 flex flex-col flex-grow">
+                            <div className="flex justify-between items-start mb-1">
+                              <span className="text-[10px] text-primary font-bold uppercase tracking-wider">{enrollment.courseId.category}</span>
+                              {refunds.find(r => r.courseId?._id === enrollment.courseId?._id && r.status === 'pending') ? (
+                                <span className="text-[9px] font-bold bg-yellow-50 text-yellow-600 px-2 py-1 rounded-full border border-yellow-100">
+                                  Cancellation Pending
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => handleRequestRefund(enrollment._id)}
+                                  className="text-[9px] font-bold text-red-500 hover:bg-red-50 px-2 py-1 rounded-full border border-red-100 transition-colors"
+                                >
+                                  Cancel & Refund
+                                </button>
+                              )}
                             </div>
-                            
-                            {enrollment.progress === 100 ? (
-                              <button 
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setSelectedCertificate(enrollment);
-                                }}
-                                className="w-full py-2.5 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-200"
-                              >
-                                <Award size={14} /> Download Certificate
-                              </button>
-                            ) : (
-                              <button 
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  handleDeleteEnrollment(enrollment.courseId._id);
-                                }}
-                                className="w-full py-2 bg-red-50 text-red-600 text-xs font-bold rounded-lg hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2"
-                              >
-                                <X size={14} /> Remove Course
-                              </button>
-                            )}
+                            <h3 className="font-bold text-md mb-3 line-clamp-2 group-hover:text-primary transition-colors">{enrollment.courseId.title}</h3>
+                            <div className="mt-auto pt-3 border-t border-border">
+                              <div className="flex justify-between items-center mb-2">
+                                <span className="text-xs font-medium text-text-muted">Progress</span>
+                                <span className="text-xs font-bold">{enrollment.progress}%</span>
+                              </div>
+                              <div className="w-full bg-secondary rounded-full h-1 mb-4">
+                                <div className="bg-primary h-full rounded-full transition-all duration-500" style={{ width: `${enrollment.progress}%` }}></div>
+                              </div>
+
+                              {enrollment.progress === 100 ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setSelectedCertificate(enrollment);
+                                  }}
+                                  className="w-full py-2.5 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-200"
+                                >
+                                  <Award size={14} /> Download Certificate
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleDeleteEnrollment(enrollment.courseId._id);
+                                  }}
+                                  className="w-full py-2 bg-red-50 text-red-600 text-xs font-bold rounded-lg hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2"
+                                >
+                                  <X size={14} /> Remove Course
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  )})}
+                      </motion.div>
+                    )
+                  })}
                   {enrollments.length === 0 && (
                     <div className="col-span-full py-12 text-center bg-white rounded-2xl border border-dashed border-border">
                       <p className="text-text-muted mb-4">You have not enrolled in any courses yet.</p>
@@ -483,19 +483,19 @@ const StudentDashboard = () => {
                   {/* Community Feed */}
                   <div className="lg:col-span-2 space-y-6">
                     <div className="card p-6 border-border bg-primary/5">
-                      <h3 className="font-bold mb-4 flex items-center gap-2"><MessageSquare size={18} className="text-primary"/> Share an update</h3>
-                      <textarea 
+                      <h3 className="font-bold mb-4 flex items-center gap-2"><MessageSquare size={18} className="text-primary" /> Share an update</h3>
+                      <textarea
                         value={newPostContent}
                         onChange={(e) => setNewPostContent(e.target.value)}
-                        placeholder="Ask a question or share your progress..." 
+                        placeholder="Ask a question or share your progress..."
                         className="w-full p-4 rounded-xl border border-border focus:border-primary focus:outline-none bg-white text-sm min-h-[100px] mb-4"
                       ></textarea>
                       <div className="flex justify-between items-center">
                         <div className="flex gap-2">
-                          <button className="p-2 hover:bg-white rounded-lg text-text-muted transition-colors"><Star size={18}/></button>
-                          <button className="p-2 hover:bg-white rounded-lg text-text-muted transition-colors"><Activity size={18}/></button>
+                          <button className="p-2 hover:bg-white rounded-lg text-text-muted transition-colors"><Star size={18} /></button>
+                          <button className="p-2 hover:bg-white rounded-lg text-text-muted transition-colors"><Activity size={18} /></button>
                         </div>
-                        <button 
+                        <button
                           onClick={handleCreatePost}
                           className="btn btn-primary px-6 py-2 rounded-full text-sm shadow-sm"
                         >
@@ -523,23 +523,23 @@ const StudentDashboard = () => {
                           </div>
                           <p className="text-sm text-text mb-4 whitespace-pre-wrap">{post.content}</p>
                           <div className="flex gap-6 pt-4 border-t border-secondary">
-                            <button 
+                            <button
                               onClick={() => handleToggleLike(post._id)}
                               className={`flex items-center gap-2 text-xs font-bold transition-colors ${post.likes?.some(l => l.toString() === user?._id?.toString()) ? 'text-primary' : 'text-text-muted hover:text-primary'}`}
                             >
-                              <Star size={16} fill={post.likes?.some(l => l.toString() === user?._id?.toString()) ? 'currentColor' : 'none'}/> {post.likes?.length || 0} Likes
+                              <Star size={16} fill={post.likes?.some(l => l.toString() === user?._id?.toString()) ? 'currentColor' : 'none'} /> {post.likes?.length || 0} Likes
                             </button>
-                            <button 
+                            <button
                               onClick={() => setActiveReplyPost(activeReplyPost === post._id ? null : post._id)}
                               className={`flex items-center gap-2 text-xs font-bold transition-colors ${activeReplyPost === post._id ? 'text-primary' : 'text-text-muted hover:text-primary'}`}
                             >
-                              <MessageSquare size={16}/> {post.repliesCount || 0} Replies
+                              <MessageSquare size={16} /> {post.repliesCount || 0} Replies
                             </button>
                           </div>
 
                           {/* Replies Section */}
                           {activeReplyPost === post._id && (
-                            <motion.div 
+                            <motion.div
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: 'auto' }}
                               className="mt-4 pt-4 border-t border-secondary space-y-4"
@@ -558,9 +558,9 @@ const StudentDashboard = () => {
                                   <p className="text-center text-[10px] text-text-muted italic py-2">No replies yet. Be the first to comment!</p>
                                 )}
                               </div>
-                              
+
                               <div className="flex gap-2">
-                                <input 
+                                <input
                                   type="text"
                                   value={replyContent}
                                   onChange={(e) => setReplyContent(e.target.value)}
@@ -568,7 +568,7 @@ const StudentDashboard = () => {
                                   className="flex-grow p-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:border-primary transition-all"
                                   onKeyPress={(e) => e.key === 'Enter' && handleReply(post._id)}
                                 />
-                                <button 
+                                <button
                                   onClick={() => handleReply(post._id)}
                                   className="bg-primary text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-primary-dark transition-all"
                                 >
@@ -618,7 +618,7 @@ const StudentDashboard = () => {
                     </div>
                     <h3 className="text-xl font-bold mb-4">Contact Support</h3>
                     <p className="text-text-muted text-sm mb-6">Our dedicated team at Ecera System is here to help you with any technical or academic issues.</p>
-                    
+
                     <div className="space-y-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-background rounded-full flex items-center justify-center text-primary">
@@ -629,7 +629,7 @@ const StudentDashboard = () => {
                           <p className="font-bold">support@ecerasystem.com</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-background rounded-full flex items-center justify-center text-primary">
                           <Activity size={16} />
@@ -685,13 +685,13 @@ const StudentDashboard = () => {
       </div>
       {/* Real Support Chat - Floating Assistant */}
       <div className="fixed bottom-8 right-8 z-[100]">
-        <motion.div 
+        <motion.div
           initial={false}
           animate={isSupportOpen ? 'open' : 'closed'}
           className="relative"
         >
           {isSupportOpen && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               className="absolute bottom-20 right-0 w-80 md:w-96 bg-white rounded-3xl shadow-2xl border border-border overflow-hidden flex flex-col max-h-[500px]"
@@ -707,14 +707,14 @@ const StudentDashboard = () => {
                     <p className="text-[10px] uppercase font-bold tracking-widest opacity-80">Powered by Ecera AI</p>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => {
                     setIsSupportOpen(false);
                     setAiMessages([{ role: 'assistant', content: "Hello! I'm your AI Academic Assistant. How can I help you with your courses today?" }]);
-                  }} 
+                  }}
                   className="hover:bg-white/10 p-2 rounded-full transition-colors"
                 >
-                  <X size={20}/>
+                  <X size={20} />
                 </button>
               </div>
 
@@ -723,11 +723,10 @@ const StudentDashboard = () => {
                 <>
                   {aiMessages.map((msg, i) => (
                     <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[80%] p-4 rounded-2xl text-sm font-medium shadow-sm ${
-                        msg.role === 'user' 
-                        ? 'bg-primary text-white rounded-tr-none' 
+                      <div className={`max-w-[80%] p-4 rounded-2xl text-sm font-medium shadow-sm ${msg.role === 'user'
+                        ? 'bg-primary text-white rounded-tr-none'
                         : 'bg-white text-text border border-border rounded-tl-none'
-                      }`}>
+                        }`}>
                         {msg.content}
                       </div>
                     </div>
@@ -749,11 +748,11 @@ const StudentDashboard = () => {
 
               {/* Chat Input */}
               <form onSubmit={handleSendSupportMessage} className="p-4 bg-white border-t border-border flex gap-2">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={supportInput}
                   onChange={(e) => setSupportInput(e.target.value)}
-                  placeholder="Type your message..." 
+                  placeholder="Type your message..."
                   className="flex-grow p-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:border-primary transition-all"
                 />
                 <button type="submit" className="bg-primary text-white p-3 rounded-xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
@@ -764,7 +763,7 @@ const StudentDashboard = () => {
           )}
 
           {/* Floating Bubble */}
-          <button 
+          <button
             onClick={() => setIsSupportOpen(!isSupportOpen)}
             className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${isSupportOpen ? 'bg-white text-primary border border-primary/20 rotate-90' : 'bg-primary text-white hover:scale-110 active:scale-95'}`}
           >
@@ -799,12 +798,12 @@ const StudentDashboard = () => {
               @page { size: landscape; margin: 0; }
             }
           `}</style>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             className="bg-white w-full max-w-4xl rounded-[2.5rem] overflow-hidden shadow-2xl relative max-h-[95vh] overflow-y-auto custom-scrollbar"
           >
-            <button 
+            <button
               onClick={() => setSelectedCertificate(null)}
               className="absolute top-6 right-6 w-10 h-10 bg-background rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-all z-10 no-print"
             >
@@ -817,7 +816,7 @@ const StudentDashboard = () => {
                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none flex items-center justify-center select-none rotate-[-30deg]">
                   <h1 className="text-9xl font-black uppercase">ECERA SYSTEM</h1>
                 </div>
-                
+
                 <div className="relative z-10">
                   <div className="flex justify-center mb-12">
                     <div className="relative">
@@ -843,7 +842,7 @@ const StudentDashboard = () => {
                   <p className="text-text-muted text-lg max-w-2xl mx-auto leading-relaxed mb-12">
                     For demonstrating exceptional proficiency and successfully mastering all advanced requirements of the specialized professional course:
                   </p>
-                  
+
                   <h3 className="text-2xl md:text-4xl font-black text-[#0a0a0a] mb-20 px-10 py-5 bg-[#0a0a0a]/5 rounded-none border-l-8 border-r-8 border-[#c5a059] inline-block shadow-sm">
                     {selectedCertificate.courseId?.title}
                   </h3>
@@ -857,10 +856,10 @@ const StudentDashboard = () => {
 
                     <div className="flex flex-col items-center">
                       <div className="w-24 h-24 border-4 border-[#0a0a0a]/5 p-2 rounded-xl bg-white shadow-sm mb-4">
-                         {/* QR Code Placeholder */}
-                         <div className="w-full h-full bg-[#0a0a0a] rounded flex items-center justify-center opacity-10">
-                            <Star size={24} className="text-white" />
-                         </div>
+                        {/* QR Code Placeholder */}
+                        <div className="w-full h-full bg-[#0a0a0a] rounded flex items-center justify-center opacity-10">
+                          <Star size={24} className="text-white" />
+                        </div>
                       </div>
                       <p className="text-[8px] font-black text-text-muted uppercase tracking-tighter">Scan to Verify Official Credentials</p>
                     </div>
@@ -876,13 +875,13 @@ const StudentDashboard = () => {
             </div>
 
             <div className="bg-[#0a0a0a] p-6 md:p-8 flex flex-col md:flex-row justify-center gap-4 border-t border-[#c5a059]/20 no-print">
-              <button 
+              <button
                 onClick={() => window.print()}
                 className="bg-[#c5a059] text-white px-8 py-4 rounded-none font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-[#b08d4a] transition-all shadow-xl shadow-[#c5a059]/10 text-xs md:text-sm"
               >
                 <FileText size={18} /> Save as PDF / Print
               </button>
-              <button 
+              <button
                 onClick={() => setSelectedCertificate(null)}
                 className="bg-white/10 text-white px-8 py-4 rounded-none font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-white/20 transition-all text-xs md:text-sm border border-white/20"
               >

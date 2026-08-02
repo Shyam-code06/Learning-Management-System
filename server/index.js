@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
 dotenv.config();
+console.log("GEMINI_API_KEY =", process.env.GEMINI_API_KEY);
 connectDB();
 
 const app = express();
@@ -11,7 +12,6 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
-
 // Routes
 const authRouter = require('./routes/authRoutes');
 const courseRouter = require('./routes/courseRoutes');
